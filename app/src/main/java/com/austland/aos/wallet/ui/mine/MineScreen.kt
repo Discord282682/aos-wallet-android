@@ -86,13 +86,6 @@ class MineViewModel(private val store: WalletStore) : ViewModel() {
         }
     }
 
-    /**
-     * If the wallet is eligible right now (`canClaimNow == true`), solves the SHA-256 `0000`
-     * Proof-of-Work and submits `POST /earn/claim` immediately so the user gets instant feedback
-     * and sees their new balance + block hash right away, then schedules WorkManager for the next
-     * cooldown cycle. If the wallet is currently on cooldown, queues WorkManager to auto-claim
-     * as soon as the cooldown expires (even if the app is closed).
-     */
     fun mineOrQueueSession(context: Context) {
         val kp = store.currentKeyPair() ?: return
         val currentMiner = miner
@@ -125,9 +118,7 @@ class MineViewModel(private val store: WalletStore) : ViewModel() {
                     }
                     val solved = result.first
                     val resp = result.second
-                    lastClaimReceipt = "Mined +${resp.transaction.amount} AOS in ${solved.attempts} hashes (Nonce ${solved.powNonce})
-Block: ${resp.transaction.txHash.take(20)}…"
-                    // Automatically queue the next background cycle for when cooldown finishes
+                    lastClaimReceipt = "Mined +${resp.transaction.amount} AOS in ${solved.attempts} hashes (Nonce ${solved.powNonce}) | Block: ${resp.transaction.txHash.take(20)}…"
                     store.miningSessionActive = true
                     sessionActive = true
                     WorkScheduler.scheduleMiningClaim(context, currentConfig.earnCooldownSeconds.coerceAtLeast(1L))
@@ -177,7 +168,6 @@ fun MineScreen(walletStore: WalletStore) {
             while (true) {
                 delay(1000)
                 tick++
-                // Auto-refresh when cooldown timer hits 0 so button unlocks cleanly
                 val m = viewModel.miner
                 if (m != null && !m.canClaimNow && m.nextClaimAt > 0 && (System.currentTimeMillis() / 1000) >= m.nextClaimAt && tick % 3L == 0L) {
                     viewModel.refresh()
@@ -201,8 +191,9 @@ fun MineScreen(walletStore: WalletStore) {
             fontWeight = FontWeight.Bold
         )
         Text("Proof-of-Work Stralen Mining", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        val prefixLabel = viewModel.config?.powPrefix ?: "0000"
         Text(
-            "Your phone computes SHA-256 hashes until it finds a nonce starting with "${viewModel.config?.powPrefix ?: "0000"}", signs the claim with your Ed25519 key, and mints new Au5 directly from the Estbrugh Treasury.",
+            "Your phone computes SHA-256 hashes until it finds a nonce starting with '$prefixLabel', signs the claim with your Ed25519 key, and mints new Au5 directly from the Estbrugh Treasury.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 4.dp, bottom = 18.dp)
