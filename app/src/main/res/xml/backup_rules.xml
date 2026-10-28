@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pre-Android-12 backup rules. The private key lives in wallet_secure_prefs (encrypted),
+     but a restored backup on a different device/keystore can't decrypt it anyway, so we
+     exclude it outright rather than ship an unusable encrypted blob. -->
+<full-backup-content>
+    <exclude domain="sharedpref" path="wallet_secure_prefs.xml" />
+    <exclude domain="sharedpref" path="wallet_secure_prefs_v2.xml" />
+</full-backup-content>
