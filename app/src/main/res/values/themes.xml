@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme; actual Material3 theming is applied in Compose (ui/theme/Theme.kt).
+         This XML theme only covers the window background shown before Compose draws. -->
+    <style name="Theme.AosWallet" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/aos_bg_dark</item>
+        <item name="android:statusBarColor">@color/aos_bg_dark</item>
+        <item name="android:navigationBarColor">@color/aos_bg_dark</item>
+    </style>
+</resources>
