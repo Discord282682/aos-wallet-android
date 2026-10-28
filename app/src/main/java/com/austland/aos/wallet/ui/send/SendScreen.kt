@@ -245,8 +245,7 @@ fun SendScreen(walletStore: WalletStore) {
             is SendState.Broadcasting -> StatusCard("Broadcasting signed transfer to Estbrugh gateway…", busy = true)
             is SendState.Success -> {
                 StatusCard(
-                    "Confirmed on ledger after ${state.attempts} PoW hashes!
-Tx Hash: ${state.txHash}",
+                    "Confirmed on ledger after ${state.attempts} PoW hashes! | Tx Hash: ${state.txHash}",
                     busy = false,
                     isError = false
                 )
